@@ -7,6 +7,7 @@ def draw_player(screen, bg, x, y, height, width):
     pygame.draw.rect(screen, (0, 0, 0), (x, y, height, width))
     pygame.display.update()
     screen.blit(bg, [0, 0])
+
 def main():
     screen = pygame.display.set_mode((500, 500))
     x=50
@@ -26,7 +27,7 @@ def main():
 
     #draw text
     pygame.font.init()
-    myfont = pygame.font.SysFont('Comic Sans MS', 15)
+    myfont = pygame.font.SysFont('Garamond', 15)
 
     # main loop
     while running:
@@ -44,20 +45,20 @@ def main():
 
         key = pygame.key.get_pressed()
 
-        if key[pygame.K_RIGHT] and x<460:
+        if key[pygame.K_RIGHT] and player.x<460:
             player.x=player.x+speed
             #draw_player(screen, bg, player.x, player.y, player.height, player.width)
 
             p_dir = 'r'
-        if key[pygame.K_LEFT] and x>0:
+        if key[pygame.K_LEFT] and player.x>0:
             player.x=player.x-speed
             #draw_player(screen, bg, player.x, player.y, player.height, player.width)
             p_dir = 'l'
-        if key[pygame.K_UP] and y>0:
+        if key[pygame.K_UP] and player.y>0:
             player.y=player.y-speed
             #draw_player(screen, bg, player.x, player.y, player.height, player.width)
             p_dir = 'u'
-        if key[pygame.K_DOWN] and y<440:
+        if key[pygame.K_DOWN] and player.y<440:
             player.y=player.y+speed
             #draw_player(screen, bg, player.x, player.y, player.height, player.width)
             p_dir = 'd'

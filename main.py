@@ -2,7 +2,7 @@ import pygame
 import player1
 
 def draw_player(screen, bg, x, y, height, width):
-    pygame.draw.rect(screen, (0, 0, 0), (x, y, height, width))
+    pygame.draw.rect(screen, (0, 0, 0), (x, y, width, height))
     pygame.display.update()
     screen.blit(bg, [0, 0])
 
@@ -20,47 +20,48 @@ def play_music():
 
 def main():
 
+    #init pygame, sounds/music, images
     pygame.init()
-
     init_music()
-
+    play_music()
     sword_sound = pygame.mixer.Sound("swordwav.wav")
-    
     screen = pygame.display.set_mode((500, 500))
+    bg = pygame.image.load("grass.png")
+    screen.blit(bg, [0,0])
+    sword = pygame.image.load("sword.png")
+    sword = pygame.transform.scale(sword, (50, 50))
+
+    #player properties
     x=50
     y=50
-
     pHeight = 60
     pWidth = 40
-
     speed = 5
-    swrd_dly = 0
-    bg = pygame.image.load("grass.png")
-    sword = pygame.image.load("sword.png")
-    sword = pygame.transform.scale(sword, (50,50))
-    running = True
-    screen.blit(bg, [0,0])
     p_dir = 'r'
-    player = pygame.Rect(x, y, pHeight, pWidth)
 
-    #draw text
+    #initialize player
+    protag = player1.Player(screen, [0,0,0], x, y, pHeight, pWidth, speed, p_dir)
+    swrd_dly = 0
+
+    #debug info to display player coordinates
     pygame.font.init()
     myfont = pygame.font.SysFont('Garamond', 15)
-
-    #debug coordinates
     disp_coor = False
 
-    play_music()
+    running = True
 
     # main loop
     while running:
         pygame.time.delay(33)
-        
-        draw_player(screen, bg, player.x, player.y, player.height, player.width)
 
+        #redraws the player every cycle
+        draw_player(protag.window_, bg, protag.xPos_, protag.yPos_, protag.height_, protag.width_)
+
+        #need to add cooldown so debug isnt spammed
         if disp_coor:
-            get_coor(screen, myfont, player.x, player.y)
+            get_coor(screen, myfont, protag.xPos_, protag.yPos_)
 
+        #makes sure sword isnt spammed
         if swrd_dly > 0:
             swrd_dly=swrd_dly-1
 
@@ -72,34 +73,38 @@ def main():
 
         key = pygame.key.get_pressed()
 
-        if key[pygame.K_RIGHT] and player.x<460:
-            player.x=player.x+speed
-            #draw_player(screen, bg, player.x, player.y, player.height, player.width)
+        #movement block
+        if key[pygame.K_RIGHT] and protag.xPos_<460:
+            protag.xPos_=protag.xPos_+protag.speed_
+            protag.dir_ = 'r'
+        if key[pygame.K_LEFT] and protag.xPos_>0:
+            protag.xPos_=protag.xPos_-protag.speed_
+            protag.dir_ = 'l'
+        if key[pygame.K_UP] and protag.yPos_>0:
+            protag.yPos_=protag.yPos_-protag.speed_
+            protag.dir_ = 'u'
+        if key[pygame.K_DOWN] and protag.yPos_<440:
+            protag.yPos_=protag.yPos_+protag.speed_
+            protag.dir_ = 'd'
 
-            p_dir = 'r'
-        if key[pygame.K_LEFT] and player.x>0:
-            player.x=player.x-speed
-            #draw_player(screen, bg, player.x, player.y, player.height, player.width)
-            p_dir = 'l'
-        if key[pygame.K_UP] and player.y>0:
-            player.y=player.y-speed
-            #draw_player(screen, bg, player.x, player.y, player.height, player.width)
-            p_dir = 'u'
-        if key[pygame.K_DOWN] and player.y<440:
-            player.y=player.y+speed
-            #draw_player(screen, bg, player.x, player.y, player.height, player.width)
-            p_dir = 'd'
+         #checking for attack
         if key[pygame.K_SPACE] and swrd_dly==0:
             pygame.mixer.Sound.play(sword_sound)
-            if p_dir == 'r':
-                screen.blit(sword, [player.x+50, player.y+15])
-            if p_dir == 'l':
-                screen.blit(pygame.transform.rotate(sword, 180), [player.x-55, player.y+20])
-            if p_dir == 'u':
-                screen.blit(pygame.transform.rotate(sword, 90), [player.x, player.y-55])
-            if p_dir == 'd':
-                screen.blit(pygame.transform.rotate(sword, 270), [player.x, player.y+65])
+
+            #makes sure sword corresponds to player's direction
+            if protag.dir_ == 'r':
+                screen.blit(sword, [protag.xPos_+50, protag.yPos_+15])
+            if protag.dir_ == 'l':
+                screen.blit(pygame.transform.rotate(sword, 180), [protag.xPos_-55, protag.yPos_+20])
+            if protag.dir_ == 'u':
+                screen.blit(pygame.transform.rotate(sword, 90), [protag.xPos_, protag.yPos_-55])
+            if protag.dir_ == 'd':
+                screen.blit(pygame.transform.rotate(sword, 270), [protag.xPos_, protag.yPos_+65])
+
+            #adds some delay so sword isnt spammed
             swrd_dly = 15
+
+        #init debug coordinates
         if key[pygame.K_BACKSPACE]:
             disp_coor = not disp_coor
 

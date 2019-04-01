@@ -1,12 +1,13 @@
 class Player:
-    def __init__(self, window, color, xPos, yPos, length, width, speed):
+    def __init__(self, window, color, xPos, yPos, height, width, speed, dir):
         self.window_ = window
         self.color_ = color
         self.xPos_ = xPos
         self.yPos_ = yPos
-        self.length_ = length
+        self.height_ = height
         self.width_ = width
         self.speed_ = speed
+        self.dir_ = dir
 
-    def getPos(self):
-        print("x: ", self.xPos_, " y: ", self.yPos_)
+
+

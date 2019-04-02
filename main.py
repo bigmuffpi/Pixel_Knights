@@ -1,3 +1,17 @@
+'''
+THINGS TO DO
+
+use variables instead of hardcoded numbers, e.g. window size, colors, etc.
+
+fix height and width being backwards
+
+get stuff into functions and classes
+
+merge player1 and enemy classes?
+
+'''
+
+
 import pygame
 import player1
 import enemy
@@ -31,6 +45,29 @@ def init_music():
 
 def play_music():
     pygame.mixer.music.play(-1)
+
+def draw_x(screen):
+
+    x1 = 0
+    x2 = 0
+    y1 = 0
+    y2 = 0
+
+    for i in range(0, 500, 5):
+        pygame.draw.line(screen, (255, 0,0), [0, x2], [500, y2])
+        x2 = x2+5
+        y2 = y2+5
+
+def draw_y(screen):
+
+    x1 = 0
+    x2 = 0
+    y1 = 0
+    y2 = 0
+    for i in range(0, 500, 5):
+        pygame.draw.line(screen, (255,0,0), [x1, 0], [y1, 500])
+        x1 = x1+5
+        y1 = y1+5
 
 def main():
 
@@ -79,6 +116,14 @@ def main():
     # main loop
     while running:
         pygame.time.delay(33)
+        # time for slow test
+        #pygame.time.delay(100)
+
+        #draw grid, 5x5 pixels
+        draw_x(screen)
+        draw_y(screen)
+
+
         #pygame.time.delay(500)
         # debug testing coordinates
         # print(str(a_rect.x) + " " + str(a_rect.y))
@@ -141,6 +186,10 @@ def main():
 
 
         if key[pygame.K_SPACE] and swrd_dly==0:
+            # play sword sound
+            if swrd_out == False:
+                pygame.mixer.Sound.play(sword_sound)
+
             # makes sure sword corresponds to player's direction
             if protag.dir_ == 'r':
                 screen.blit(sword, [protag.xPos_+50, protag.yPos_+15])
@@ -150,11 +199,6 @@ def main():
                 screen.blit(pygame.transform.rotate(sword, 90), [protag.xPos_, protag.yPos_-55])
             if protag.dir_ == 'd':
                 screen.blit(pygame.transform.rotate(sword, 270), [protag.xPos_, protag.yPos_+65])
-
-            # play sword once per sycle
-
-            if swrd_out == False:
-                pygame.mixer.Sound.play(sword_sound)
 
             # adds some delay so sword isnt spammed
             swrd_out = True

@@ -9,6 +9,7 @@ get stuff into functions and classes
 
 merge player1 and enemy classes?
 
+
 '''
 
 
@@ -106,9 +107,9 @@ def main():
     # debug info to display player coordinates
     pygame.font.init()
     myfont = pygame.font.SysFont('Garamond', 15)
-    disp_coor = False
+    debug_en = False
 
-    #obj_list = [protag, antag]
+    # obj_list = [protag, antag]
     # test for enemy image, no need to draw rect
     obj_list = [protag]
     running = True
@@ -116,29 +117,20 @@ def main():
     # main loop
     while running:
         pygame.time.delay(33)
+
         # time for slow test
-        #pygame.time.delay(100)
-
-        #draw grid, 5x5 pixels
-        draw_x(screen)
-        draw_y(screen)
-
-
-        #pygame.time.delay(500)
-        # debug testing coordinates
-        # print(str(a_rect.x) + " " + str(a_rect.y))
-
-        # redraws the player every cycle
-        # draw_player(protag.window_, bg, protag.xPos_, protag.yPos_, protag.height_, protag.width_)
-        # draw enemy
-        # draw_player(antag.window_, bg, antag.xPos_, antag.yPos_, antag.height_, antag.width_)
-        # need to add cooldown so debug isnt spammed
+        # pygame.time.delay(100)
 
         # draw list of objects rather than each object individually
         draw_objects(obj_list, screen, bg)
 
-        # check if player coordinates and therefore display
-        if disp_coor:
+        # check if debug enabled to display stats
+        if debug_en:
+            # draw grid, 5x5 pixels
+            draw_x(screen)
+            draw_y(screen)
+
+            # display player coordinates
             get_coor(screen, myfont, protag.xPos_, protag.yPos_)
 
         # makes sure sword isnt spammed
@@ -216,8 +208,8 @@ def main():
         if a_rect.y == 410:
             a_dir = True
 
-        # init debug coordinates
+        # init debug
         if key[pygame.K_BACKSPACE]:
-            disp_coor = not disp_coor
+            debug_en = not debug_en
 
 main()

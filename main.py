@@ -1,10 +1,24 @@
 import pygame
 import player1
+import enemy
+
+def draw_objects(obj_list, screen, bg):
+    for i in range(0, len(obj_list)):
+        pygame.draw.rect(screen, (0, 0, 0), (obj_list[i].xPos_, obj_list[i].yPos_, obj_list[i].width_, obj_list[i].height_))
+    pygame.display.update()
+    screen.blit(bg, [0, 0])
 
 def draw_player(screen, bg, x, y, height, width):
     pygame.draw.rect(screen, (0, 0, 0), (x, y, width, height))
     pygame.display.update()
     screen.blit(bg, [0, 0])
+
+def enemy_path(x, speed, dir):
+    if dir:
+        newX = x-speed
+    else:
+        newX = x+speed
+    return newX
 
 def get_coor(screen, myfont, x, y):
     coord = str(x) + "/"+ str(y)
@@ -20,7 +34,7 @@ def play_music():
 
 def main():
 
-    #init pygame, sounds/music, images
+    # init pygame, sounds/music, images
     pygame.init()
     init_music()
     play_music()
@@ -30,8 +44,10 @@ def main():
     screen.blit(bg, [0,0])
     sword = pygame.image.load("sword.png")
     sword = pygame.transform.scale(sword, (50, 50))
+    enemy_sprite = pygame.image.load("enemy.jpg")
+    enemy_sprite = pygame.transform.scale(enemy_sprite, (50,250))
 
-    #player properties
+    # player properties
     x=50
     y=50
     pHeight = 60
@@ -39,31 +55,53 @@ def main():
     speed = 5
     p_dir = 'r'
 
-    #initialize player
+    # initialize player
     protag = player1.Player(screen, [0,0,0], x, y, pHeight, pWidth, speed, p_dir)
     swrd_dly = 0
+    p_rect = pygame.Rect(protag.xPos_, protag.yPos_, protag.width_, protag.height_)
 
-    #debug info to display player coordinates
+    # adding enemy
+    antag = enemy.Enemy(screen, [255,0,0], 410, 250, 250, 50, speed, p_dir)
+    a_rect = pygame.Rect(antag.xPos_, antag.yPos_, antag.width_, antag.height_)
+    a_dir = True
+
+    # debug info to display player coordinates
     pygame.font.init()
     myfont = pygame.font.SysFont('Garamond', 15)
     disp_coor = False
 
+    #obj_list = [protag, antag]
+    # test for enemy image, no need to draw rect
+    obj_list = [protag]
     running = True
 
     # main loop
     while running:
         pygame.time.delay(33)
+        #pygame.time.delay(500)
+        # debug testing coordinates
+        # print(str(a_rect.x) + " " + str(a_rect.y))
 
-        #redraws the player every cycle
-        draw_player(protag.window_, bg, protag.xPos_, protag.yPos_, protag.height_, protag.width_)
+        # redraws the player every cycle
+        # draw_player(protag.window_, bg, protag.xPos_, protag.yPos_, protag.height_, protag.width_)
+        # draw enemy
+        # draw_player(antag.window_, bg, antag.xPos_, antag.yPos_, antag.height_, antag.width_)
+        # need to add cooldown so debug isnt spammed
 
-        #need to add cooldown so debug isnt spammed
+        # draw list of objects rather than each object individually
+        draw_objects(obj_list, screen, bg)
+
+        # check if player coordinates and therefore display
         if disp_coor:
             get_coor(screen, myfont, protag.xPos_, protag.yPos_)
 
-        #makes sure sword isnt spammed
+        # makes sure sword isnt spammed
         if swrd_dly > 0:
             swrd_dly=swrd_dly-1
+
+        # move teh enemy
+        antag.yPos_ = enemy_path(antag.yPos_, antag.speed_, a_dir)
+        screen.blit(enemy_sprite, [antag.xPos_, antag.yPos_])
 
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
@@ -73,7 +111,11 @@ def main():
 
         key = pygame.key.get_pressed()
 
-        #movement block
+        #check collision
+        if p_rect.colliderect(a_rect):
+            print("we lost")
+
+        # movement block
         if key[pygame.K_RIGHT] and protag.xPos_<460:
             protag.xPos_=protag.xPos_+protag.speed_
             protag.dir_ = 'r'
@@ -87,11 +129,11 @@ def main():
             protag.yPos_=protag.yPos_+protag.speed_
             protag.dir_ = 'd'
 
-         #checking for attack
+        # checking for attack
         if key[pygame.K_SPACE] and swrd_dly==0:
             pygame.mixer.Sound.play(sword_sound)
 
-            #makes sure sword corresponds to player's direction
+            # makes sure sword corresponds to player's direction
             if protag.dir_ == 'r':
                 screen.blit(sword, [protag.xPos_+50, protag.yPos_+15])
             if protag.dir_ == 'l':
@@ -101,10 +143,22 @@ def main():
             if protag.dir_ == 'd':
                 screen.blit(pygame.transform.rotate(sword, 270), [protag.xPos_, protag.yPos_+65])
 
-            #adds some delay so sword isnt spammed
+            # adds some delay so sword isnt spammed
             swrd_dly = 15
 
-        #init debug coordinates
+        # update player
+        p_rect.x = protag.xPos_
+        p_rect.y = protag.yPos_
+
+        # check enemy direction and flip if ncessary
+        a_rect.y = antag.yPos_
+
+        if a_rect.y == 90:
+            a_dir = False
+        if a_rect.y == 410:
+            a_dir = True
+
+        # init debug coordinates
         if key[pygame.K_BACKSPACE]:
             disp_coor = not disp_coor
 

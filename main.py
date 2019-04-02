@@ -58,6 +58,7 @@ def main():
     # initialize player
     protag = player1.Player(screen, [0,0,0], x, y, pHeight, pWidth, speed, p_dir)
     swrd_dly = 0
+    swrd_out = False
     p_rect = pygame.Rect(protag.xPos_, protag.yPos_, protag.width_, protag.height_)
 
     # adding enemy
@@ -118,21 +119,28 @@ def main():
         # movement block
         if key[pygame.K_RIGHT] and protag.xPos_<460:
             protag.xPos_=protag.xPos_+protag.speed_
-            protag.dir_ = 'r'
+            if not key[pygame.K_SPACE]:     # we dont want a turn when attack is being held
+                protag.dir_ = 'r'
         if key[pygame.K_LEFT] and protag.xPos_>0:
             protag.xPos_=protag.xPos_-protag.speed_
-            protag.dir_ = 'l'
+            if not key[pygame.K_SPACE]:
+                protag.dir_ = 'l'
         if key[pygame.K_UP] and protag.yPos_>0:
             protag.yPos_=protag.yPos_-protag.speed_
-            protag.dir_ = 'u'
+            if not key[pygame.K_SPACE]:
+                protag.dir_ = 'u'
         if key[pygame.K_DOWN] and protag.yPos_<440:
             protag.yPos_=protag.yPos_+protag.speed_
-            protag.dir_ = 'd'
+            if not key[pygame.K_SPACE]:
+                protag.dir_ = 'd'
 
-        # checking for attack
+        # checking for attack and controlling cooldown
+        if not key[pygame.K_SPACE] and swrd_out == True:
+            swrd_dly = 15
+            swrd_out = False
+
+
         if key[pygame.K_SPACE] and swrd_dly==0:
-            pygame.mixer.Sound.play(sword_sound)
-
             # makes sure sword corresponds to player's direction
             if protag.dir_ == 'r':
                 screen.blit(sword, [protag.xPos_+50, protag.yPos_+15])
@@ -143,8 +151,14 @@ def main():
             if protag.dir_ == 'd':
                 screen.blit(pygame.transform.rotate(sword, 270), [protag.xPos_, protag.yPos_+65])
 
+            # play sword once per sycle
+
+            if swrd_out == False:
+                pygame.mixer.Sound.play(sword_sound)
+
             # adds some delay so sword isnt spammed
-            swrd_dly = 15
+            swrd_out = True
+
 
         # update player
         p_rect.x = protag.xPos_
